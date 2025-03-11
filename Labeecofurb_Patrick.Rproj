@@ -1,0 +1,9 @@
+#aula 3
+
+a <-  1+1
+# Pacote tidyverse
+
+
+#install.packages("tidyverse")
+
+library(tidyverse) # Carregar a biblioteca
