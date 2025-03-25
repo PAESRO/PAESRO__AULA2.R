@@ -23,3 +23,11 @@ dadospIB <- WDI(country = 'all', indicator = 'NY.GDP.MKTP.CD')
 
 dadospIB2023 <- WDI(country = 'all', indicator = 'NY.GDP.MKTP.CD', start = 2023, end = 2023)
 
+# dado em painel
+Dadosdoscombustíveis <- WDI(country = 'all', indicator = 'EG.CFT.ACCS.ZS')
+
+# corte temporal
+dadoscombustíveis2023 <- WDI(country = 'all', indicator = 'EG.CFT.ACCS.ZS', start = 2023, end = 2023)
+
+# Série temporal
+dadoscombustíveisBR <- WDI(country = 'BR', indicator = 'EG.CFT.ACCS.ZS')
