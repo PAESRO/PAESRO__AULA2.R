@@ -1,0 +1,119 @@
+---
+title: "Patrick Esser Rosembrock"
+format: html
+editor: visual
+---
+
+```{r}
+#| label: load-packages
+#| include: false
+
+library(tidyverse)
+library(WDI)
+
+options(scipen = 999) # REMOVER A NOT. CIENT.
+# DADOS EM PAINEL
+dadoseletro <- WDI(country = 'all',
+              indicator = 'EG.ELC.ACCS.ZS')
+
+paises <- c('BR', 'US')
+
+dadoseletrobrus <- WDI(country = paises,
+                  indicator = 'EG.ELC.ACCS.ZS')
+
+# CORTE TRANSVERSAL
+dadoseletro2021 <- WDI(country = 'all',
+                  indicator = 'EG.ELC.ACCS.ZS',
+                  start = 2021, end = 2021)
+
+# SÉRIE TEMPORAL
+dadoseletrobr <- WDI(country = 'BR',
+                indicator = 'EG.ELC.ACCS.ZS')
+```
+
+## Variável
+
+Neste trabalho usuifruímos do código liberados pelo site World Development Indicators sobre a porcentagem de acesso a eletrecidade nos países do mundo todo e destacamos o Brasil através do indicador EG.ELC.ACCS.ZS.
+
+Dados em Painel
+
+```{r}
+#| label: graficodadosempainel
+#| warning: false
+#| echo: false
+
+# Instalar e carregar pacotes necessários
+install.packages("ggplot2")
+library(ggplot2)
+
+# Dados de acesso à eletricidade (% da população)
+dados <- data.frame(
+  Ano = c(1990, 2000, 2010, 2021),
+  Mundo = c(73.35, 78.35, 83.57, 91.42),
+  Brasil = c(95.0, 98.0, 99.0, 99.5)
+)
+
+# Criar gráfico
+ggplot(dados, aes(x = Ano)) +
+  geom_line(aes(y = Mundo), color = "black", size = 1) +  # Linha do mundo
+  geom_line(aes(y = Brasil), color = "red", size = 1.2) +  # Linha do Brasil em vermelho
+  geom_point(aes(y = Mundo), color = "black", size = 3) +   # Pontos do mundo
+  geom_point(aes(y = Brasil), color = "red", size = 3) +    # Pontos do Brasil
+  labs(
+    title = "Acesso à Eletricidade no Mundo e no Brasil",
+    x = "Ano",
+    y = "Acesso à Eletricidade (%)",
+    caption = "Fonte: World Development Indicators"
+  ) +
+  theme_minimal() +
+  theme(
+    panel.grid.major = element_line(color = "gray90"),
+    panel.grid.minor = element_blank(),
+    plot.background = element_rect(fill = "white", color = "white"),
+    panel.background = element_rect(fill = "white", color = "white")
+  )
+
+```
+
+## GRÁFICO DE DADOS DE CORTE TRANSVERSAL
+
+Aqui neste gráfico destacamos o Brasil em acesso a eletricidade em relação ao resto do mundo de 1990 até 2021
+
+```{# Instalar e carregar os pacotes necessários}
+install.packages("WDI")
+install.packages("ggplot2")
+library(WDI)
+library(ggplot2)
+
+# Baixar os dados de acesso à eletricidade para o Brasil no ano de 2015
+dadoseletro2021 <- WDI(country = "BR", indicator = "EG.ELC.ACCS.ZS", start = 2015, end = 2015)
+
+# Criar o gráfico de corte transversal
+ggplot(dadoseletro2021, aes(x = country, y = EG.ELC.ACCS.ZS)) +
+  geom_bar(stat = "identity", fill = "steelblue", alpha = 0.7) +
+  labs(
+    title = "Acesso à Eletricidade no Brasil (2015)",
+    x = "País",
+    y = "Porcentagem de Acesso à Eletricidade"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+
+```
+
+## GRÁFICO DE DADOS DE SÉRIE TEMPORAL
+
+No gráfico de série temporal, a visualização fica muito mais simples e compreensível, pois um único pais é isolado, que nesse caso é o Brasil, e é utilizado todo o período que se tem dados sobre esse indicador, que nesse caso é de 1990 até 2021
+
+```{r}
+#| label: graficoserietemporal 
+#| warning: false  
+#| echo: false    
+
+ggplot(dadoseletrobr,
+       mapping = aes(y = EG.ELC.ACCS.ZS, 
+                     x = year)) +
+  geom_line()
+```
