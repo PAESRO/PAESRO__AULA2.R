@@ -77,30 +77,47 @@ ggplot(dados, aes(x = Ano)) +
 
 ## GRÁFICO DE DADOS DE CORTE TRANSVERSAL
 
-Aqui neste gráfico destacamos o Brasil em acesso a eletricidade em relação ao resto do mundo de 1990 até 2021
+Aqui neste gráfico destacamos o Brasil em 2021 com acesso a eletricidade com um corte.
 
-```{# Instalar e carregar os pacotes necessários}
-install.packages("WDI")
-install.packages("ggplot2")
+```{r}
+#| label: graficoserietransversal
+#| echo: false
+#| warning: false
+# Instalar pacotes se necessário
+# install.packages("WDI")
+# install.packages("ggplot2")
+# install.packages("dplyr")
+
+# Carregar bibliotecas
 library(WDI)
 library(ggplot2)
+library(dplyr)
 
-# Baixar os dados de acesso à eletricidade para o Brasil no ano de 2015
-dadoseletro2021 <- WDI(country = "BR", indicator = "EG.ELC.ACCS.ZS", start = 2015, end = 2015)
+# Obter dados do indicador para o ano de 2021
+dadoseletro2021 <- WDI(country = "all",
+                  indicator = "EG.ELC.ACCS.ZS",
+                  start = 2021, end = 2021)
 
-# Criar o gráfico de corte transversal
-ggplot(dadoseletro2021, aes(x = country, y = EG.ELC.ACCS.ZS)) +
-  geom_bar(stat = "identity", fill = "steelblue", alpha = 0.7) +
-  labs(
-    title = "Acesso à Eletricidade no Brasil (2015)",
-    x = "País",
-    y = "Porcentagem de Acesso à Eletricidade"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# Filtrar os dados para remover NAs
+dados_filtrados <- dadoseletro2021 %>%
+  filter(!is.na(EG.ELC.ACCS.ZS)) %>%
+  arrange(desc(EG.ELC.ACCS.ZS))  # Ordenar de forma decrescente
 
+# Adicionar uma coluna para destacar o Brasil
+dados_filtrados <- dados_filtrados %>%
+  mutate(cor = ifelse(iso2c == "BR", "Brasil", "Outros"))
 
-
+# Criar gráfico de barras com destaque para o Brasil
+ggplot(dados_filtrados, aes(x = reorder(country, EG.ELC.ACCS.ZS), y = EG.ELC.ACCS.ZS, fill = cor)) +
+  geom_bar(stat = "identity", color = "black") +
+  scale_fill_manual(values = c("Brasil" = "red", "Outros" = "steelblue")) +  # Destacar Brasil em vermelho
+  labs(title = "Acesso à Eletricidade por País (2021)",
+       x = NULL,  # Remover rótulos do eixo X
+       y = "Porcentagem de Acesso à Eletricidade (%)") +
+  theme_minimal(base_size = 12) +
+  theme(axis.text.x = element_blank(),  # Remover os nomes dos países no eixo X
+        axis.ticks.x = element_blank(),  # Remover as linhas do eixo X
+        plot.title = element_text(hjust = 0.5))  # Centralizar o título
 ```
 
 ## GRÁFICO DE DADOS DE SÉRIE TEMPORAL
@@ -108,9 +125,9 @@ ggplot(dadoseletro2021, aes(x = country, y = EG.ELC.ACCS.ZS)) +
 No gráfico de série temporal, a visualização fica muito mais simples e compreensível, pois um único pais é isolado, que nesse caso é o Brasil, e é utilizado todo o período que se tem dados sobre esse indicador, que nesse caso é de 1990 até 2021
 
 ```{r}
-#| label: graficoserietemporal 
-#| warning: false  
-#| echo: false    
+#| label: graficoserietemporal
+#| echo: false
+#| warning: false
 
 ggplot(dadoseletrobr,
        mapping = aes(y = EG.ELC.ACCS.ZS, 
