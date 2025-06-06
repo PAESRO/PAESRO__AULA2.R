@@ -1,0 +1,87 @@
+---
+title: "Patrick Esser Rosembrock"
+format: html
+editor: visual
+---
+
+-   **Crescimento Sustentado**: Desde 1989, Santa Catarina tem se consolidado como um dos estados mais exportadores do Brasil, com destaque para produtos agropecuários e manufaturados.
+
+-   **Principais Produtos Exportados**: Em 2025, os produtos mais exportados incluem carnes de frango e suína, motores elétricos, soja, madeira serrada e móveis.
+
+-   **Volume e Valor**: Em março de 2025, as exportações catarinenses somaram US\$ 11,87 bilhões, com um crescimento de 3,4% em relação ao período anterior.
+
+-   **Mercados de Destino**: Os principais países compradores dos produtos catarinenses incluem China, Estados Unidos e Argentina.
+
+-   **Evolução ao Longo das Décadas**: O estado passou por períodos de alta e baixa, influenciados por fatores como crises econômicas globais, variações cambiais e políticas comerciais.
+
+    ```{r}
+    #| echo: false
+    #| message: false
+    #| warning: false
+    #| label: load-packages
+    #| include: false
+    library(rbcb)
+    library(tidyverse)
+    library(lubridate)
+
+    if (!requireNamespace("gganimate", quietly = TRUE)) {
+      install.packages("gganimate", repos = "https://cloud.r-project.org/")
+    }
+    library(gganimate)
+
+    if (!requireNamespace("gifski",quietly = TRUE)) {
+      install.packages("gifski", repos = "https://cloud.r-project.org/")
+    }
+      library(gifski)
+    ```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| label: grafico-exportacao
+#| results: 'asis'
+
+library(ggplot2)
+library(gganimate)
+library(rbcb)
+library(tidyverse)
+library(lubridate)
+
+
+# Baixar dados mensais da Importação
+codigo_exportacao <- 13081
+exportacao_mensal <- get_series(
+  codigo_exportacao,
+  start_date = "1989-01-01",
+  end_date = "2024-12-31"
+) %>%
+  rename(data = date, valor = `13081`) %>%
+  mutate(ano = year(data))
+
+# Calcular acumulado anual (somando as variações mensais)
+exportacao_anual <- exportacao_mensal %>%
+  group_by(ano) %>%
+  summarise(exportacao_acumulado = sum(valor, na.rm = TRUE)) %>%
+  filter(ano <= 2024)
+
+# Criar gráfico animado
+grafico_exportacao <- ggplot(exportacao_anual, aes(x = ano, y = exportacao_acumulado)) +
+  geom_line(color = "darkgreen", size = 1) +
+  geom_point(color = "darkgreen", size = 3) +
+  scale_x_continuous(breaks = seq(1989, 2024, by = 5)) +
+  scale_y_continuous(labels = scales::label_number(scale = 1e-6, suffix = " mi")) +
+  labs(
+    title = "Exportação de bens em SC (1989–2024)",
+    x = "Ano",
+    y = "US$ (mil)"
+  ) +
+  theme_minimal() +
+  transition_reveal(ano)
+
+# Salvar como GIF
+anim_save("exportacao_animado.gif", grafico_exportacao, renderer = gifski_renderer())
+
+# Exibir no HTML
+cat('![](exportacao_animado.gif)')
+```
